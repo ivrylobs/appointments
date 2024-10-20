@@ -32,6 +32,8 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 @Module({
   imports: [
+    PatientsModule,
+    DoctorsModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, authConfig, appConfig, mailConfig, fileConfig],
@@ -64,7 +66,6 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
     FilesModule,
     AuthModule,
-
     MailModule,
     MailerModule,
     HomeModule,
