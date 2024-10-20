@@ -52,6 +52,14 @@ export class PatientRelationalRepository implements PatientRepository {
     return entities.map((entity) => PatientMapper.toDomain(entity));
   }
 
+  async findByUserId(
+    userId: Patient['userId'],
+  ): Promise<NullableType<Patient>> {
+    const entity = await this.patientRepository.findOne({ where: { userId } });
+
+    return entity ? PatientMapper.toDomain(entity) : null;
+  }
+
   async update(id: Patient['id'], payload: Partial<Patient>): Promise<Patient> {
     const entity = await this.patientRepository.findOne({
       where: { id },
