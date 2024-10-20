@@ -22,6 +22,7 @@ import { MailerModule } from './mailer/mailer.module';
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { PatientsModule } from './patients/patients.module';
 import { DoctorsModule } from './doctors/doctors.module';
+import { AvailabilitySlotsModule } from './availability-slots/availability-slots.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -32,6 +33,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 @Module({
   imports: [
+    AvailabilitySlotsModule,
     PatientsModule,
     DoctorsModule,
     ConfigModule.forRoot({

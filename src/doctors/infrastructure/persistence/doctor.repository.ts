@@ -18,6 +18,10 @@ export abstract class DoctorRepository {
 
   abstract findByIds(ids: Doctor['id'][]): Promise<Doctor[]>;
 
+  abstract findByUserId(
+    userId: Doctor['userId'],
+  ): Promise<NullableType<Doctor>>;
+
   abstract update(
     id: Doctor['id'],
     payload: DeepPartial<Doctor>,

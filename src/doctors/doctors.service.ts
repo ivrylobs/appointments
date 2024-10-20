@@ -1,4 +1,9 @@
-import { Injectable, Request } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  Request,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
 import { UpdateDoctorDto } from './dto/update-doctor.dto';
 import { DoctorRepository } from './infrastructure/persistence/doctor.repository';
@@ -13,6 +18,17 @@ export class DoctorsService {
   ) {}
 
   async create(createDoctorDto: CreateDoctorDto, @Request() request) {
+    const existingDoctor = await this.doctorRepository.findByUserId(
+      request.user.id,
+    );
+
+    if (existingDoctor)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          doctor: 'this user already registered as Doctor',
+        },
+      });
     // Do not remove comment below.
     // <creating-property />
 
