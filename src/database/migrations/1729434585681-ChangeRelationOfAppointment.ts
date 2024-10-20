@@ -1,28 +1,22 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class AddPropertyToAppointment1729430897844
+export class ChangeRelationOfAppointment1729434585681
   implements MigrationInterface
 {
-  name = 'AddPropertyToAppointment1729430897844';
+  name = 'ChangeRelationOfAppointment1729434585681';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `ALTER TABLE \`appointment\` ADD \`note\` varchar(255) NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`appointment\` ADD \`status\` tinyint NOT NULL`,
+      `ALTER TABLE \`appointment\` ADD \`status\` enum ('booked', 'completed', 'cancelled') NOT NULL`,
     );
     await queryRunner.query(
       `ALTER TABLE \`appointment\` ADD \`availabilitySlotId\` uuid NOT NULL`,
     );
     await queryRunner.query(
-      `ALTER TABLE \`appointment\` ADD UNIQUE INDEX \`IDX_78159abef4597928260cf8e6af\` (\`availabilitySlotId\`)`,
-    );
-    await queryRunner.query(
       `ALTER TABLE \`appointment\` ADD \`doctorId\` uuid NOT NULL`,
-    );
-    await queryRunner.query(
-      `CREATE UNIQUE INDEX \`REL_78159abef4597928260cf8e6af\` ON \`appointment\` (\`availabilitySlotId\`)`,
     );
     await queryRunner.query(
       `ALTER TABLE \`appointment\` ADD CONSTRAINT \`FK_78159abef4597928260cf8e6af4\` FOREIGN KEY (\`availabilitySlotId\`) REFERENCES \`availability_slot\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`,
@@ -40,13 +34,7 @@ export class AddPropertyToAppointment1729430897844
       `ALTER TABLE \`appointment\` DROP FOREIGN KEY \`FK_78159abef4597928260cf8e6af4\``,
     );
     await queryRunner.query(
-      `DROP INDEX \`REL_78159abef4597928260cf8e6af\` ON \`appointment\``,
-    );
-    await queryRunner.query(
       `ALTER TABLE \`appointment\` DROP COLUMN \`doctorId\``,
-    );
-    await queryRunner.query(
-      `ALTER TABLE \`appointment\` DROP INDEX \`IDX_78159abef4597928260cf8e6af\``,
     );
     await queryRunner.query(
       `ALTER TABLE \`appointment\` DROP COLUMN \`availabilitySlotId\``,

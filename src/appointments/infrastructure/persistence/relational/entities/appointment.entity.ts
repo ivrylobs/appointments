@@ -11,10 +11,10 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
-  OneToOne,
   Column,
 } from 'typeorm';
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
+import { AppointmentStatus } from '../enums/appointmentStatus.enum';
 
 @Entity({
   name: 'appointment',
@@ -28,11 +28,12 @@ export class AppointmentEntity extends EntityRelationalHelper {
 
   @Column({
     nullable: false,
-    type: Boolean,
+    type: 'enum',
+    enum: AppointmentStatus,
   })
-  status?: boolean;
+  status: AppointmentStatus;
 
-  @OneToOne(() => AvailabilitySlotEntity, { eager: true, nullable: false })
+  @ManyToOne(() => AvailabilitySlotEntity, { eager: true, nullable: false })
   @JoinColumn()
   availabilitySlot: AvailabilitySlotEntity;
 

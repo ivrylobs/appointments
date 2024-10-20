@@ -2,6 +2,7 @@ import { DeepPartial } from '../../../utils/types/deep-partial.type';
 import { NullableType } from '../../../utils/types/nullable.type';
 import { IPaginationOptions } from '../../../utils/types/pagination-options';
 import { Appointment } from '../../domain/appointment';
+import { AppointmentStatus } from './relational/enums/appointmentStatus.enum';
 
 export abstract class AppointmentRepository {
   abstract create(
@@ -17,6 +18,11 @@ export abstract class AppointmentRepository {
   abstract findById(id: Appointment['id']): Promise<NullableType<Appointment>>;
 
   abstract findByIds(ids: Appointment['id'][]): Promise<Appointment[]>;
+
+  abstract findByAvailabilitySlotIdAndStatus(
+    availabilitySlotId: Appointment['availabilitySlot'],
+    appointmentStatus: AppointmentStatus,
+  ): Promise<NullableType<Appointment>>;
 
   abstract update(
     id: Appointment['id'],

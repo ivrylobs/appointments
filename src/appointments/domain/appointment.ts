@@ -2,6 +2,7 @@ import { AvailabilitySlot } from '../../availability-slots/domain/availability-s
 import { Doctor } from '../../doctors/domain/doctor';
 import { Patient } from '../../patients/domain/patient';
 import { ApiProperty } from '@nestjs/swagger';
+import { AppointmentStatus } from '../infrastructure/persistence/relational/enums/appointmentStatus.enum';
 
 export class Appointment {
   @ApiProperty({
@@ -11,10 +12,10 @@ export class Appointment {
   note?: string | null;
 
   @ApiProperty({
-    type: () => Boolean,
+    enum: () => AppointmentStatus,
     nullable: false,
   })
-  status?: boolean;
+  status: AppointmentStatus;
 
   @ApiProperty({
     type: () => AvailabilitySlot,

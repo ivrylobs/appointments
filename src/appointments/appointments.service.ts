@@ -8,6 +8,7 @@ import { PatientsService } from '../patients/patients.service';
 import { Patient } from '../patients/domain/patient';
 
 import {
+  BadRequestException,
   HttpStatus,
   Request,
   UnprocessableEntityException,
@@ -19,6 +20,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { AppointmentRepository } from './infrastructure/persistence/appointment.repository';
 import { IPaginationOptions } from '../utils/types/pagination-options';
 import { Appointment } from './domain/appointment';
+import { AppointmentStatus } from './infrastructure/persistence/relational/enums/appointmentStatus.enum';
 
 @Injectable()
 export class AppointmentsService {
@@ -33,6 +35,23 @@ export class AppointmentsService {
     private readonly appointmentRepository: AppointmentRepository,
   ) {}
 
+  private async validateAppointmentConflictOnSlot(
+    availabilitySlot: AvailabilitySlot,
+  ) {
+    const conflictAppointment =
+      await this.appointmentRepository.findByAvailabilitySlotIdAndStatus(
+        availabilitySlot,
+        AppointmentStatus.BOOKED,
+      );
+
+    if (conflictAppointment)
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          availabilitySlot: "This slot not available it's already booked",
+        },
+      });
+  }
   async create(createAppointmentDto: CreateAppointmentDto, @Request() request) {
     // Do not remove comment below.
     // <creating-property />
@@ -50,38 +69,30 @@ export class AppointmentsService {
     }
     const availabilitySlot = availabilitySlotObject;
 
-    let doctor: Doctor | undefined = undefined;
+    await this.validateAppointmentConflictOnSlot(availabilitySlot);
 
-    if (createAppointmentDto.doctor) {
-      const doctorObject = await this.doctorService.findById(
-        availabilitySlot.doctorId.id,
-      );
-      if (!doctorObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            doctor: 'notExists',
-          },
-        });
-      }
-      doctor = doctorObject;
+    const doctor = await this.doctorService.findById(
+      availabilitySlot.doctorId.id,
+    );
+
+    if (!doctor) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          doctor: 'notExists',
+        },
+      });
     }
 
-    let patient: Patient | undefined = undefined;
+    const patient = await this.patientService.findByUserId(request.user.id);
 
-    if (createAppointmentDto.patient) {
-      const patientObject = await this.patientService.findByUserId(
-        request.user.id,
-      );
-      if (!patientObject) {
-        throw new UnprocessableEntityException({
-          status: HttpStatus.UNPROCESSABLE_ENTITY,
-          errors: {
-            patient: 'notExists',
-          },
-        });
-      }
-      patient = patientObject;
+    if (!patient) {
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          patient: 'notExists',
+        },
+      });
     }
 
     return this.appointmentRepository.create({
@@ -89,7 +100,7 @@ export class AppointmentsService {
       // <creating-property-payload />
       note: createAppointmentDto.note,
 
-      status: createAppointmentDto.status,
+      status: AppointmentStatus.BOOKED,
 
       availabilitySlot,
 
@@ -179,6 +190,31 @@ export class AppointmentsService {
       }
       patient = patientObject;
     }
+
+    const currentAppointment = await this.appointmentRepository.findById(id);
+
+    if (!currentAppointment)
+      throw new BadRequestException({
+        status: HttpStatus.BAD_REQUEST,
+        errors: {
+          appointment:
+            'Incorrect appointmentId or this appointment does not existed',
+        },
+      });
+
+    if (
+      (updateAppointmentDto.status === AppointmentStatus.COMPLETED &&
+        currentAppointment.status === AppointmentStatus.CANCELLED) ||
+      (updateAppointmentDto.status === AppointmentStatus.CANCELLED &&
+        currentAppointment.status === AppointmentStatus.COMPLETED)
+    )
+      throw new UnprocessableEntityException({
+        status: HttpStatus.UNPROCESSABLE_ENTITY,
+        errors: {
+          appointment:
+            'Cannot change status completed on cancelled appointment either cancel appointment on completed appointment',
+        },
+      });
 
     return this.appointmentRepository.update(id, {
       // Do not remove comment below.

@@ -16,12 +16,14 @@ import {
   IsNotEmptyObject,
   IsString,
   IsOptional,
+  IsEnum,
 } from 'class-validator';
 
 import {
   // decorators here
   ApiProperty,
 } from '@nestjs/swagger';
+import { AppointmentStatus } from '../infrastructure/persistence/relational/enums/appointmentStatus.enum';
 
 export class CreateAppointmentDto {
   @ApiProperty({
@@ -32,7 +34,9 @@ export class CreateAppointmentDto {
   @IsString()
   note?: string | null;
 
-  status?: boolean;
+  @IsEnum(AppointmentStatus)
+  @IsOptional()
+  status?: AppointmentStatus;
 
   @ApiProperty({
     required: true,

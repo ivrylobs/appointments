@@ -7,6 +7,7 @@ import { Appointment } from '../../../../domain/appointment';
 import { AppointmentRepository } from '../../appointment.repository';
 import { AppointmentMapper } from '../mappers/appointment.mapper';
 import { IPaginationOptions } from '../../../../../utils/types/pagination-options';
+import { AppointmentStatus } from '../enums/appointmentStatus.enum';
 
 @Injectable()
 export class AppointmentRelationalRepository implements AppointmentRepository {
@@ -50,6 +51,20 @@ export class AppointmentRelationalRepository implements AppointmentRepository {
     });
 
     return entities.map((entity) => AppointmentMapper.toDomain(entity));
+  }
+
+  async findByAvailabilitySlotIdAndStatus(
+    availabilitySlotId: Appointment['availabilitySlot'],
+    appointmentStatus: AppointmentStatus,
+  ): Promise<NullableType<Appointment>> {
+    const entity = await this.appointmentRepository.findOne({
+      where: {
+        availabilitySlot: { id: availabilitySlotId.id },
+        status: appointmentStatus,
+      },
+    });
+
+    return entity ? AppointmentMapper.toDomain(entity) : null;
   }
 
   async update(
