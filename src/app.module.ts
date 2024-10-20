@@ -31,8 +31,11 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   },
 });
 
+import { AppointmentsModule } from './appointments/appointments.module';
+
 @Module({
   imports: [
+    AppointmentsModule,
     AvailabilitySlotsModule,
     PatientsModule,
     DoctorsModule,

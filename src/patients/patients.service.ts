@@ -63,6 +63,10 @@ export class PatientsService {
     return this.patientRepository.findByIds(ids);
   }
 
+  findByUserId(userId: Patient['userId']) {
+    return this.patientRepository.findByUserId(userId);
+  }
+
   async update(
     id: Patient['id'],
 
