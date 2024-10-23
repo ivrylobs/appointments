@@ -16,7 +16,7 @@ import { JwtPayloadType } from './strategies/types/jwt-payload.type';
 
 @ApiTags('Auth')
 @Controller({
-  path: 'auth',
+  path: 'appointments/auth',
   version: '1',
 })
 export class AuthController {

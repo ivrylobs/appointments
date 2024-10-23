@@ -33,7 +33,7 @@ import { FindAllPatientsDto } from './dto/find-all-patients.dto';
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
-  path: 'patients',
+  path: 'appointments/patients',
   version: '1',
 })
 export class PatientsController {

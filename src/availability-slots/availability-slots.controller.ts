@@ -32,7 +32,7 @@ import { FindAllAvailabilitySlotsDto } from './dto/find-all-availability-slots.d
 @ApiBearerAuth()
 @UseGuards(AuthGuard('jwt'))
 @Controller({
-  path: 'availability-slots',
+  path: 'appointments/availability-slots',
   version: '1',
 })
 export class AvailabilitySlotsController {

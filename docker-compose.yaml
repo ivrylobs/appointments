@@ -2,21 +2,20 @@ services:
   db:
     image: mariadb:lts
     ports:
-      - ${DATABASE_PORT}:3306
+      - 33061:3306
     volumes:
       - ./db/data:/var/lib/mysql/
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
 
-  # maildev:
-  #   build:
-  #     context: .
-  #     dockerfile: maildev.Dockerfile
-  #   ports:
-  #     - ${MAIL_CLIENT_PORT}:1080
-  #     - ${MAIL_PORT}:1025
-  #   volumes:
-  #     - ./mail-tmp/:/tmp
+  maildev:
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    ports:
+      - 1081:1080
+    volumes:
+      - ./mail-tmp/:/tmp
 
   # adminer:
   #   image: adminer
